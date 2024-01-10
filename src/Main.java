@@ -11,19 +11,15 @@ import java.util.Scanner;
 // Main class for console menu implementation
 public class Main {
     private static final String WINDOW_TITLE = "Westminster Shopping Center";
-    private static final String[] COLUMN_NAMES = {"Product ID",
-            "Name",
-            "Category",
-            "Price",
-            "Info"
-    };
+    private static final String[] COLUMN_NAMES = {"Product ID","Name", "Category","Price", "Info"};
     public static void main(String[] args) {
         WestminsterShoppingManager shoppingManager = new WestminsterShoppingManager();
         Scanner scanner = new Scanner(System.in);
 
+
         while (true) {
             initGui();
-            System.out.println("===== Westminster Shopping Manager Menu =====");
+            System.out.println("Westminster Shopping Manager Menu");
             System.out.println("1. Add a new product");
             System.out.println("2. Delete a product");
             System.out.println("3. Print product list");
@@ -78,10 +74,11 @@ public class Main {
                     System.out.print("Enter product ID to delete: ");
                     String deleteProductId = scanner.nextLine();
                     shoppingManager.deleteProductFromSystem(deleteProductId);
+                    System.out.println("Product with ID " + deleteProductId + " has been deleted.");
                     break;
 
                 case "3":
-                    // Print product list
+                    // Print product list7
                     shoppingManager.printProductList();
                     break;
 
