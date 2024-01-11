@@ -73,6 +73,10 @@ public class Main {
                     break;
 
                 case "6":
+                    initGui(shoppingManager);
+                    break;
+
+                case "7":
                     // Exit
                     System.out.println("Exiting Westminster Shopping Manager. Goodbye!");
                     System.exit(0);
