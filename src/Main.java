@@ -3,17 +3,17 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-
+import javax.swing.table.AbstractTableModel;
+import java.util.List;
 public class Main {
     private static final String WINDOW_TITLE = "Westminster Shopping Center";
-    private static final String[] COLUMN_NAMES = {"Product ID", "Name", "Category", "Price", "Info"};
 
     public static void main(String[] args) {
         WestminsterShoppingManager shoppingManager = new WestminsterShoppingManager();
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            initGui();
+            initGui(shoppingManager);
             System.out.println("Westminster Shopping Manager Menu");
             System.out.println("1. Add a new product");
             System.out.println("2. Delete a product");
@@ -119,8 +119,51 @@ public class Main {
         }
     }
 
-    private static void initGui() {
-        // GUI initialization code...
+    private static void initGui(WestminsterShoppingManager shoppingManager) {
+        JFrame f = new JFrame(WINDOW_TITLE);
+        final JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        final JPanel headerPanel = new JPanel(new FlowLayout());
+        final JPanel tablePanel = new JPanel();
+        final JPanel detailPanel = new JPanel();
+        detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
+
+        JLabel label1 = new JLabel("Select product category: ");
+        String[] choices = {"All", "Electronics", "Clothing"};
+        final JComboBox<String> cb = new JComboBox<>(choices);
+        f.setSize(800, 600);
+        f.setLocation(600,600);
+
+        headerPanel.add(label1);
+        headerPanel.add(cb);
+
+        // Create an instance of ProductTableModel using the productList from WestminsterShoppingManager
+        ProductTableModel tableModel = new ProductTableModel(shoppingManager.getProductList());
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setFillsViewportHeight(true);
+
+        tablePanel.add(scrollPane);
+
+        // Add all sub-panels to the main panel
+        mainPanel.add(headerPanel);
+        mainPanel.add(tablePanel);
+
+        // Add main panel to frame
+        f.add(mainPanel);
+
+        cb.addActionListener(e -> {
+            // Handle category selection (if needed)
+        });
+
+        cb.setVisible(true);
+        f.setVisible(true);
+    }
+
+
+    private static void updateDetailsPanel(JPanel detailsPanel) {
+
     }
 }
 
