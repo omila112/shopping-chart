@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
+
 public class Main {
     private static final String WINDOW_TITLE = "Westminster Shopping Center";
 
@@ -85,7 +86,24 @@ public class Main {
 
     private static void addNewProduct(Scanner scanner, WestminsterShoppingManager shoppingManager) {
         System.out.println("Select product type: 1. Electronics 2. Clothing");
-        int productType = scanner.nextInt();
+        int productType = 0;
+
+        // Validate user input for product type
+        while (true) {
+            System.out.print("Enter product type (1 for Electronics, 2 for Clothing): ");
+            if (scanner.hasNextInt()) {
+                productType = scanner.nextInt();
+                if (productType == 1 || productType == 2) {
+                    break; // Valid input, exit the loop
+                } else {
+                    System.out.println("Invalid product type. Please enter 1 or 2.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a valid integer.");
+                scanner.next(); // Consume invalid input
+            }
+        }
+
         scanner.nextLine(); // Consume newline
 
         System.out.print("Enter product ID: ");
@@ -160,7 +178,6 @@ public class Main {
         cb.setVisible(true);
         f.setVisible(true);
     }
-
 
     private static void updateDetailsPanel(JPanel detailsPanel) {
 
@@ -317,5 +334,60 @@ class WestminsterShoppingManager {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+}
+
+class ProductTableModel extends AbstractTableModel {
+    private final List<Product> productList;
+    private final String[] columnNames = {"Product ID", "Name", "Category", "Price", "Info"};
+
+    public ProductTableModel(List<Product> productList) {
+        this.productList = productList;
+    }
+
+    @Override
+    public int getRowCount() {
+        return productList.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        Product product = productList.get(rowIndex);
+
+        switch (columnIndex) {
+            case 0:
+                return product.getProductId();
+            case 1:
+                return product.getProductName();
+            case 2:
+                return product.getType();
+            case 3:
+                return product.getPrice();
+            case 4:
+                return getProductInfo(product);
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        return columnNames[column];
+    }
+
+    private String getProductInfo(Product product) {
+        if (product instanceof Electronics) {
+            Electronics electronics = (Electronics) product;
+            return "Brand: " + electronics.getBrand() + ", Warranty Period: " + electronics.getWarrantyPeriod();
+        } else if (product instanceof Clothing) {
+            Clothing clothing = (Clothing) product;
+            return "Size: " + clothing.getSize() + ", Color: " + clothing.getColor();
+        }
+        return "";
     }
 }
