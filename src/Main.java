@@ -8,13 +8,12 @@ import java.util.List;
 
 public class Main {
     private static final String WINDOW_TITLE = "Westminster Shopping Center";
+    public static WestminsterShoppingManager shoppingManager = new WestminsterShoppingManager();
 
     public static void main(String[] args) {
-        WestminsterShoppingManager shoppingManager = new WestminsterShoppingManager();
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            initGui(shoppingManager);
             System.out.println("Westminster Shopping Manager Menu");
             System.out.println("1. Add a new product");
             System.out.println("2. Delete a product");
@@ -143,6 +142,8 @@ public class Main {
     }
 
     private static void initGui(WestminsterShoppingManager shoppingManager) {
+        if (shoppingManager.hasGui) return;
+
         JFrame f = new JFrame(WINDOW_TITLE);
         final JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
@@ -182,6 +183,9 @@ public class Main {
 
         cb.setVisible(true);
         f.setVisible(true);
+
+        // We spawned a GUI, update the state
+        shoppingManager.hasGui = true;
     }
 
     private static void updateDetailsPanel(JPanel detailsPanel) {
@@ -271,6 +275,7 @@ class Clothing extends Product {
 
 class WestminsterShoppingManager {
     private List<Product> productList;
+    public boolean hasGui = false;
 
     public WestminsterShoppingManager() {
         this.productList = new ArrayList<>();
