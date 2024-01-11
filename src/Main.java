@@ -21,7 +21,8 @@ public class Main {
             System.out.println("3. Print product list");
             System.out.println("4. Save product list to file");
             System.out.println("5. Load product list from file");
-            System.out.println("6. Exit");
+            System.out.println("6. To open GUI Menu");
+            System.out.println("7. Exit");
 
             System.out.print("Enter your choice: ");
             String choice = scanner.next();
