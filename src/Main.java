@@ -22,7 +22,6 @@ public class Main {
             System.out.println("5. Load product list from file");
             System.out.println("6. To open GUI Menu");
             System.out.println("7. Exit");
-
             System.out.print("Enter your choice: ");
             String choice = scanner.next();
             scanner.nextLine(); // Consume newline
@@ -108,10 +107,23 @@ public class Main {
             }
         }
 
-        scanner.nextLine(); // Consume newline
 
-        System.out.print("Enter product ID: ");
         String productId = scanner.nextLine();
+        while (true) {
+            System.out.print("Enter product ID: ");
+            productId = scanner.nextLine();
+
+            // Check if the product ID is unique
+            final String finalProductId = productId;
+            boolean isUnique = shoppingManager.getProductList().stream()
+                    .noneMatch(product -> product.getProductId().equals(finalProductId));
+
+            if (isUnique) {
+                break; // Valid input, exit the loop
+            } else {
+                System.out.println("Product ID already exists. Please enter a unique product ID.");
+            }
+        }
         System.out.print("Enter product name: ");
         String productName = scanner.nextLine();
         System.out.print("Enter available items: ");
@@ -156,7 +168,7 @@ public class Main {
         String[] choices = {"All", "Electronics", "Clothing"};
         final JComboBox<String> cb = new JComboBox<>(choices);
         f.setSize(800, 600);
-        f.setLocation(600,600);
+        f.setLocation(600, 600);
 
         headerPanel.add(label1);
         headerPanel.add(cb);
@@ -170,9 +182,21 @@ public class Main {
 
         tablePanel.add(scrollPane);
 
+        // Add product details panel below the table
+        detailPanel.add(new JLabel("Selected Product Details:"));
+        detailPanel.add(new JLabel("Product ID:"));
+        detailPanel.add(new JLabel("Category:"));
+        detailPanel.add(new JLabel("Name:"));
+        detailPanel.add(new JLabel("Size:"));
+        detailPanel.add(new JLabel("Color:"));
+        detailPanel.add(new JLabel("Brand:"));
+        detailPanel.add(new JLabel("Warranty Period:"));
+        detailPanel.add(new JLabel("Item Available:"));
+
         // Add all sub-panels to the main panel
         mainPanel.add(headerPanel);
         mainPanel.add(tablePanel);
+        mainPanel.add(detailPanel);
 
         // Add main panel to frame
         f.add(mainPanel);
@@ -181,16 +205,38 @@ public class Main {
             // Handle category selection (if needed)
         });
 
+        table.getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow >= 0) {
+                Product selectedProduct = shoppingManager.getProductList().get(selectedRow);
+                updateDetailsPanel(detailPanel, selectedProduct);
+            }
+        });
+
         cb.setVisible(true);
         f.setVisible(true);
 
-        // We spawned a GUI, update the state
         shoppingManager.hasGui = true;
     }
+private static void updateDetailsPanel(JPanel detailsPanel, Product selectedProduct) {
+        if (selectedProduct != null) {
+        ((JLabel) detailsPanel.getComponent(1)).setText("Product ID: " + selectedProduct.getProductId());
+        ((JLabel) detailsPanel.getComponent(2)).setText("Category: " + selectedProduct.getType());
+        ((JLabel) detailsPanel.getComponent(3)).setText("Name: " + selectedProduct.getProductName());
 
-    private static void updateDetailsPanel(JPanel detailsPanel) {
+        if (selectedProduct instanceof Clothing) {
+            Clothing clothing = (Clothing) selectedProduct;
+            ((JLabel) detailsPanel.getComponent(4)).setText("Size: " + clothing.getSize());
+            ((JLabel) detailsPanel.getComponent(5)).setText("Color: " + clothing.getColor());
+        } else if (selectedProduct instanceof Electronics) {
+            Electronics electronics = (Electronics) selectedProduct;
+            ((JLabel) detailsPanel.getComponent(6)).setText("Brand: " + electronics.getBrand());
+            ((JLabel) detailsPanel.getComponent(7)).setText("Warranty Period: " + electronics.getWarrantyPeriod());
+        }
 
+        ((JLabel) detailsPanel.getComponent(8)).setText("Item Available: " + selectedProduct.getAvailableItems());
     }
+}
 }
 
 abstract class Product implements Serializable {
@@ -342,7 +388,7 @@ class WestminsterShoppingManager {
             productList = (List<Product>) ois.readObject();
             System.out.println("Product list loaded from file.");
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.err.println("Error loading product list from file: " + e.getMessage());
         }
     }
 }
@@ -393,11 +439,39 @@ class ProductTableModel extends AbstractTableModel {
     private String getProductInfo(Product product) {
         if (product instanceof Electronics) {
             Electronics electronics = (Electronics) product;
-            return "Brand: " + electronics.getBrand() + ", Warranty Period: " + electronics.getWarrantyPeriod();
+            return "Brand: " + electronics.getBrand() + ", Warranty Period in weeks: " + electronics.getWarrantyPeriod();
         } else if (product instanceof Clothing) {
             Clothing clothing = (Clothing) product;
             return "Size: " + clothing.getSize() + ", Color: " + clothing.getColor();
         }
         return "";
+    }
+    public class MyWindow extends JFrame {
+        // Constructor
+        public MyWindow() {
+            setTitle("Shopping Cart");
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            setSize(400, 300);
+            setLocationRelativeTo(null); // Center the window on the screen
+
+            // Create a panel to hold the components
+            JPanel panel = new JPanel();
+
+            // Create a button for shopping cart
+            JButton shoppingCartButton = new JButton("Shopping Cart");
+
+            // Add the button to the panel
+            panel.add(shoppingCartButton);
+
+            // Add the panel to the frame's content pane
+            getContentPane().add(panel);
+        }
+
+        public void main(String[] args) {
+            SwingUtilities.invokeLater(() -> {
+                MyWindow window = new MyWindow();
+                window.setVisible(true);
+            });
+        }
     }
 }
