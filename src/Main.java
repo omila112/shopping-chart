@@ -12,6 +12,16 @@ public class Main {
     public static WestminsterShoppingManager shoppingManager = new WestminsterShoppingManager();
     private static List<Product> shoppingCart = new ArrayList<>();
 
+    public static final JPanel mainPanel = new JPanel();
+    public static final JPanel headerPanel = new JPanel(new FlowLayout());
+    public static final JPanel tablePanel = new JPanel();
+    public static final JPanel detailPanel = new JPanel();
+
+    static {
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         JFrame shoppingCartFrame;
@@ -160,12 +170,6 @@ public class Main {
         if (shoppingManager.hasGui) return;
 
         JFrame f = new JFrame(WINDOW_TITLE);
-        final JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        final JPanel headerPanel = new JPanel(new FlowLayout());
-        final JPanel tablePanel = new JPanel();
-        final JPanel detailPanel = new JPanel();
-        detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
 
         JLabel label1 = new JLabel("Select product category: ");
         String[] choices = {"All", "Electronics", "Clothing"};
@@ -183,15 +187,6 @@ public class Main {
 
         tablePanel.add(scrollPane);
         detailPanel.add(new JLabel("Selected Product Details:"));
-        detailPanel.add(new JLabel("Product ID:"));
-        detailPanel.add(new JLabel("Category:"));
-        detailPanel.add(new JLabel("Name:"));
-        detailPanel.add(new JLabel("Size:"));
-        detailPanel.add(new JLabel("Color:"));
-        detailPanel.add(new JLabel("Brand:"));
-        detailPanel.add(new JLabel("Warranty Period:"));
-        detailPanel.add(new JLabel("Item Available:"));
-
 
         JButton addToCartButton = new JButton("Add to Cart");
         addToCartButton.addActionListener(e -> {
@@ -207,14 +202,29 @@ public class Main {
         mainPanel.add(detailPanel);
         f.add(mainPanel);
 
+        // TODO: Finish this
         cb.addActionListener(e -> {
+            String item = (String) cb.getSelectedItem();
+            if (item == null) return;
+
+            switch (item.toLowerCase()) {
+                case "all": {
+                    break;
+                }
+                case "electronics": {
+                    break;
+                }
+                case "clothing": {
+                    break;
+                }
+            }
         });
 
         table.getSelectionModel().addListSelectionListener(e -> {
             int selectedRow = table.getSelectedRow();
             if (selectedRow >= 0) {
                 Product selectedProduct = shoppingManager.getProductList().get(selectedRow);
-                updateDetailsPanel(detailPanel, selectedProduct);
+                updateDetailsPanel(selectedProduct);
             }
         });
 
@@ -252,24 +262,31 @@ public class Main {
 
         cartTableModel.addRow(new Object[]{product.getProductName(), 1, product.getPrice()});
     }
-    private static void updateDetailsPanel(JPanel detailsPanel, Product selectedProduct) {
+    private static void updateDetailsPanel(Product selectedProduct) {
         if (selectedProduct != null) {
-            ((JLabel) detailsPanel.getComponent(1)).setText("Product ID: " + selectedProduct.getProductId());
-            ((JLabel) detailsPanel.getComponent(2)).setText("Category: " + selectedProduct.getType());
-            ((JLabel) detailsPanel.getComponent(3)).setText("Name: " + selectedProduct.getProductName());
+            // Remove all JLabels from the detailPanel
+            Arrays.stream(detailPanel.getComponents())
+                    .filter(c -> c instanceof JLabel)
+                    .forEach(detailPanel::remove);
+
+            detailPanel.add(new JLabel("Product ID: " + selectedProduct.getProductId()));
+            detailPanel.add(new JLabel("Category: " + selectedProduct.getType()));
+            detailPanel.add(new JLabel("Name: " + selectedProduct.getProductName()));
 
             if (selectedProduct instanceof Clothing) {
                 Clothing clothing = (Clothing) selectedProduct;
-                ((JLabel) detailsPanel.getComponent(4)).setText("Size: " + clothing.getSize());
-                ((JLabel) detailsPanel.getComponent(5)).setText("Color: " + clothing.getColor());
+                detailPanel.add(new JLabel("Size: " + clothing.getSize()));
+                detailPanel.add(new JLabel("Color: " + clothing.getColor()));
             } else if (selectedProduct instanceof Electronics) {
                 Electronics electronics = (Electronics) selectedProduct;
-                ((JLabel) detailsPanel.getComponent(6)).setText("Brand: " + electronics.getBrand());
-                ((JLabel) detailsPanel.getComponent(7)).setText("Warranty Period: " + electronics.getWarrantyPeriod());
+                detailPanel.add(new JLabel("Brand: " + electronics.getBrand()));
+                detailPanel.add(new JLabel("Warranty Period: " + electronics.getWarrantyPeriod()));
             }
 
-            ((JLabel) detailsPanel.getComponent(8)).setText("Item Available: " + selectedProduct.getAvailableItems());
+            detailPanel.add(new JLabel("Item Available: " + selectedProduct.getAvailableItems()));
         }
+
+        detailPanel.revalidate();
     }
 }
 
