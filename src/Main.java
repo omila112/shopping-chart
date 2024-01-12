@@ -4,14 +4,17 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
 public class Main {
     private static final String WINDOW_TITLE = "Westminster Shopping Center";
     public static WestminsterShoppingManager shoppingManager = new WestminsterShoppingManager();
+    private static List<Product> shoppingCart = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        JFrame shoppingCartFrame;
 
         while (true) {
             System.out.println("Westminster Shopping Manager Menu");
@@ -97,7 +100,7 @@ public class Main {
             if (scanner.hasNextInt()) {
                 productType = scanner.nextInt();
                 if (productType == 1 || productType == 2) {
-                    break; // Valid input, exit the loop
+                    break;
                 } else {
                     System.out.println("Invalid product type. Please enter 1 or 2.");
                 }
@@ -133,7 +136,6 @@ public class Main {
         scanner.nextLine(); // Consume newline
 
         if (productType == 1) {
-            // Electronics
             System.out.print("Enter brand: ");
             String brand = scanner.nextLine();
             System.out.print("Enter warranty period: ");
@@ -141,6 +143,7 @@ public class Main {
 
             Electronics electronics = new Electronics(productId, productName, availableItems, price, brand, warrantyPeriod);
             shoppingManager.addProductToSystem(electronics);
+
         } else if (productType == 2) {
             // Clothing
             System.out.print("Enter size: ");
@@ -193,6 +196,17 @@ public class Main {
         detailPanel.add(new JLabel("Warranty Period:"));
         detailPanel.add(new JLabel("Item Available:"));
 
+
+        JButton addToCartButton = new JButton("Add to Cart");
+        addToCartButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow >= 0) {
+                Product selectedProduct = shoppingManager.getProductList().get(selectedRow);
+                addToShoppingCart(selectedProduct);
+            }
+        });
+        detailPanel.add(addToCartButton);
+
         // Add all sub-panels to the main panel
         mainPanel.add(headerPanel);
         mainPanel.add(tablePanel);
@@ -218,26 +232,67 @@ public class Main {
 
         shoppingManager.hasGui = true;
     }
-private static void updateDetailsPanel(JPanel detailsPanel, Product selectedProduct) {
-        if (selectedProduct != null) {
-        ((JLabel) detailsPanel.getComponent(1)).setText("Product ID: " + selectedProduct.getProductId());
-        ((JLabel) detailsPanel.getComponent(2)).setText("Category: " + selectedProduct.getType());
-        ((JLabel) detailsPanel.getComponent(3)).setText("Name: " + selectedProduct.getProductName());
 
-        if (selectedProduct instanceof Clothing) {
-            Clothing clothing = (Clothing) selectedProduct;
-            ((JLabel) detailsPanel.getComponent(4)).setText("Size: " + clothing.getSize());
-            ((JLabel) detailsPanel.getComponent(5)).setText("Color: " + clothing.getColor());
-        } else if (selectedProduct instanceof Electronics) {
-            Electronics electronics = (Electronics) selectedProduct;
-            ((JLabel) detailsPanel.getComponent(6)).setText("Brand: " + electronics.getBrand());
-            ((JLabel) detailsPanel.getComponent(7)).setText("Warranty Period: " + electronics.getWarrantyPeriod());
+    private static void addToShoppingCart(Product product) {
+        // Create or update the shopping cart window
+        JPopupMenu shoppingCartFrame = new JPopupMenu();
+        if (shoppingCartFrame == null || !shoppingCartFrame.isVisible()) {
+            createShoppingCartFrame();
         }
 
-        ((JLabel) detailsPanel.getComponent(8)).setText("Item Available: " + selectedProduct.getAvailableItems());
+        // Add the selected product details to the shopping cart window
+        addToShoppingCartWindow(product);
+    }
+
+    private static void createShoppingCartFrame() {
+        JFrame shoppingCartFrame     = new JFrame("Shopping Cart");
+        shoppingCartFrame.setSize(400, 300);
+        shoppingCartFrame.setLayout(new BorderLayout());
+
+        // Create a table model for the shopping cart with initial columns
+        DefaultTableModel cartTableModel = new DefaultTableModel(new Object[][]{}, new Object[]{"Product", "Quantity", "Price"});
+
+        // Create a JTable for the shopping cart
+        JTable cartTable = new JTable(cartTableModel);
+        JScrollPane cartScrollPane = new JScrollPane(cartTable);
+
+        // Add the cart table to the shopping cart frame
+        shoppingCartFrame.add(cartScrollPane, BorderLayout.CENTER);
+
+        // Set the frame visibility to true
+        shoppingCartFrame.setVisible(true);
+    }
+
+    private static void addToShoppingCartWindow(Product product) {
+        // Get the table model from the shopping cart frame
+        JDialog shoppingCartFrame = new JDialog();
+        JTable cartTable = (JTable) ((JScrollPane) shoppingCartFrame.getContentPane().getComponent(0)).getViewport().getView();
+        DefaultTableModel cartTableModel = (DefaultTableModel) cartTable.getModel();
+
+        // Add the selected product to the shopping cart table
+        cartTableModel.addRow(new Object[]{product.getProductName(), 1, product.getPrice()});
+    }
+    private static void updateDetailsPanel(JPanel detailsPanel, Product selectedProduct) {
+        if (selectedProduct != null) {
+            ((JLabel) detailsPanel.getComponent(1)).setText("Product ID: " + selectedProduct.getProductId());
+            ((JLabel) detailsPanel.getComponent(2)).setText("Category: " + selectedProduct.getType());
+            ((JLabel) detailsPanel.getComponent(3)).setText("Name: " + selectedProduct.getProductName());
+
+            if (selectedProduct instanceof Clothing) {
+                Clothing clothing = (Clothing) selectedProduct;
+                ((JLabel) detailsPanel.getComponent(4)).setText("Size: " + clothing.getSize());
+                ((JLabel) detailsPanel.getComponent(5)).setText("Color: " + clothing.getColor());
+            } else if (selectedProduct instanceof Electronics) {
+                Electronics electronics = (Electronics) selectedProduct;
+                ((JLabel) detailsPanel.getComponent(6)).setText("Brand: " + electronics.getBrand());
+                ((JLabel) detailsPanel.getComponent(7)).setText("Warranty Period: " + electronics.getWarrantyPeriod());
+            }
+
+            ((JLabel) detailsPanel.getComponent(8)).setText("Item Available: " + selectedProduct.getAvailableItems());
+        }
     }
 }
-}
+
 
 abstract class Product implements Serializable {
     private String productId;
@@ -446,32 +501,5 @@ class ProductTableModel extends AbstractTableModel {
         }
         return "";
     }
-    public class MyWindow extends JFrame {
-        // Constructor
-        public MyWindow() {
-            setTitle("Shopping Cart");
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setSize(400, 300);
-            setLocationRelativeTo(null); // Center the window on the screen
 
-            // Create a panel to hold the components
-            JPanel panel = new JPanel();
-
-            // Create a button for shopping cart
-            JButton shoppingCartButton = new JButton("Shopping Cart");
-
-            // Add the button to the panel
-            panel.add(shoppingCartButton);
-
-            // Add the panel to the frame's content pane
-            getContentPane().add(panel);
-        }
-
-        public void main(String[] args) {
-            SwingUtilities.invokeLater(() -> {
-                MyWindow window = new MyWindow();
-                window.setVisible(true);
-            });
-        }
-    }
 }
