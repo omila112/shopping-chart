@@ -175,8 +175,6 @@ public class Main {
 
         headerPanel.add(label1);
         headerPanel.add(cb);
-
-        // Create an instance of ProductTableModel using the productList from WestminsterShoppingManager
         ProductTableModel tableModel = new ProductTableModel(shoppingManager.getProductList());
         JTable table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
@@ -184,8 +182,6 @@ public class Main {
         table.setFillsViewportHeight(true);
 
         tablePanel.add(scrollPane);
-
-        // Add product details panel below the table
         detailPanel.add(new JLabel("Selected Product Details:"));
         detailPanel.add(new JLabel("Product ID:"));
         detailPanel.add(new JLabel("Category:"));
@@ -206,17 +202,12 @@ public class Main {
             }
         });
         detailPanel.add(addToCartButton);
-
-        // Add all sub-panels to the main panel
         mainPanel.add(headerPanel);
         mainPanel.add(tablePanel);
         mainPanel.add(detailPanel);
-
-        // Add main panel to frame
         f.add(mainPanel);
 
         cb.addActionListener(e -> {
-            // Handle category selection (if needed)
         });
 
         table.getSelectionModel().addListSelectionListener(e -> {
@@ -239,8 +230,6 @@ public class Main {
         if (shoppingCartFrame == null || !shoppingCartFrame.isVisible()) {
             createShoppingCartFrame();
         }
-
-        // Add the selected product details to the shopping cart window
         addToShoppingCartWindow(product);
     }
 
@@ -248,28 +237,19 @@ public class Main {
         JFrame shoppingCartFrame     = new JFrame("Shopping Cart");
         shoppingCartFrame.setSize(400, 300);
         shoppingCartFrame.setLayout(new BorderLayout());
-
-        // Create a table model for the shopping cart with initial columns
         DefaultTableModel cartTableModel = new DefaultTableModel(new Object[][]{}, new Object[]{"Product", "Quantity", "Price"});
-
-        // Create a JTable for the shopping cart
         JTable cartTable = new JTable(cartTableModel);
         JScrollPane cartScrollPane = new JScrollPane(cartTable);
-
-        // Add the cart table to the shopping cart frame
         shoppingCartFrame.add(cartScrollPane, BorderLayout.CENTER);
 
-        // Set the frame visibility to true
         shoppingCartFrame.setVisible(true);
     }
 
     private static void addToShoppingCartWindow(Product product) {
-        // Get the table model from the shopping cart frame
         JDialog shoppingCartFrame = new JDialog();
         JTable cartTable = (JTable) ((JScrollPane) shoppingCartFrame.getContentPane().getComponent(0)).getViewport().getView();
         DefaultTableModel cartTableModel = (DefaultTableModel) cartTable.getModel();
 
-        // Add the selected product to the shopping cart table
         cartTableModel.addRow(new Object[]{product.getProductName(), 1, product.getPrice()});
     }
     private static void updateDetailsPanel(JPanel detailsPanel, Product selectedProduct) {
@@ -501,5 +481,4 @@ class ProductTableModel extends AbstractTableModel {
         }
         return "";
     }
-
 }
