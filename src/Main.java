@@ -166,7 +166,7 @@ public class Main {
         }
     }
 
-    private static void initGui(WestminsterShoppingManager shoppingManager) {
+    private static void initGui(WestminsterShoppingManager shoppingManager) { //referenced from stackoverflow and lecture notes
         if (shoppingManager.hasGui) return;
 
         JFrame f = new JFrame(WINDOW_TITLE);
@@ -202,7 +202,7 @@ public class Main {
         mainPanel.add(detailPanel);
         f.add(mainPanel);
 
-        // TODO: Finish this
+        //toodo
         cb.addActionListener(e -> {
             String item = (String) cb.getSelectedItem();
             if (item == null) return;
@@ -243,7 +243,7 @@ public class Main {
         addToShoppingCartWindow(product);
     }
 
-    private static void createShoppingCartFrame() {
+    private static void createShoppingCartFrame() { //referenced from stackoverflow and lecture notes
         JFrame shoppingCartFrame     = new JFrame("Shopping Cart");
         shoppingCartFrame.setSize(400, 300);
         shoppingCartFrame.setLayout(new BorderLayout());
@@ -255,16 +255,15 @@ public class Main {
         shoppingCartFrame.setVisible(true);
     }
 
-    private static void addToShoppingCartWindow(Product product) {
+    private static void addToShoppingCartWindow(Product product) { //referenced from stackoverflow and lecture notes
         JDialog shoppingCartFrame = new JDialog();
         JTable cartTable = (JTable) ((JScrollPane) shoppingCartFrame.getContentPane().getComponent(0)).getViewport().getView();
         DefaultTableModel cartTableModel = (DefaultTableModel) cartTable.getModel();
 
         cartTableModel.addRow(new Object[]{product.getProductName(), 1, product.getPrice()});
     }
-    private static void updateDetailsPanel(Product selectedProduct) {
+    private static void updateDetailsPanel(Product selectedProduct) { 
         if (selectedProduct != null) {
-            // Remove all JLabels from the detailPanel
             Arrays.stream(detailPanel.getComponents())
                     .filter(c -> c instanceof JLabel)
                     .forEach(detailPanel::remove);
